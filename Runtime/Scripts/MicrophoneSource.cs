@@ -72,7 +72,6 @@ namespace LiveKit
             var source = _sourceObject.AddComponent<AudioSource>();
             source.clip = clip;
             source.loop = true;
-
             var probe = _sourceObject.AddComponent<AudioProbe>();
             // Clear the audio data after it is read as to not play it through the speaker locally.
             probe.ClearAfterInvocation();
