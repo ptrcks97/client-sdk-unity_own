@@ -70,7 +70,6 @@ namespace LiveKit
 
             int clipLengthSamples = (int)_targetSampleRate;
             
-            //Ein echter AudioClip wird erstellt
             _streamClip = AudioClip.Create(
                 name: "LiveKitStream",
                 lengthSamples: clipLengthSamples,
@@ -81,10 +80,6 @@ namespace LiveKit
             );
             _audioSource.clip = _streamClip;
             _audioSource.loop = true;
-
-
-            //var probe = _audioSource.gameObject.AddComponent<AudioProbe>();
-            //probe.AudioRead += OnAudioRead;
             _audioSource.Play();
         }
 
@@ -144,7 +139,6 @@ namespace LiveKit
             }
         }
 
-        // Called on the MainThread (See FfiClient)
         private void OnAudioStreamEvent(AudioStreamEvent e)
         {
             if ((ulong)Handle.DangerousGetHandle() != e.StreamHandle)
