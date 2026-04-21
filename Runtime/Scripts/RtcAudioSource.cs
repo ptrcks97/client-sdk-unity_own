@@ -37,6 +37,10 @@ namespace LiveKit
         public static uint DefaultMicrophoneSampleRate = 24000;
 
         public static uint DefaultSampleRate = 48000;
+#elif UNITY_ANDROID && !UNITY_EDITOR
+        public static uint DefaultMicrophoneSampleRate = 24000;
+
+        public static uint DefaultSampleRate = 24000;
 #else
         public static uint DefaultSampleRate = 48000;
         public static uint DefaultMicrophoneSampleRate = DefaultSampleRate;

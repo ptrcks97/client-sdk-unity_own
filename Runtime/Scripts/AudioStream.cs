@@ -19,9 +19,16 @@ namespace LiveKit
         private short[] _tempBuffer;
         private uint _numChannels;
         private uint _sampleRate;
+
         private AudioResampler _resampler = new AudioResampler();
         private object _lock = new object();
         private bool _disposed = false;
+
+        private uint _targetChannels;
+
+        private uint _targetSampleRate;
+
+        private AudioClip _streamClip;
 
         /// <summary>
         /// Creates a new audio stream from a remote audio track, attaching it to the
@@ -49,10 +56,60 @@ namespace LiveKit
             Handle = FfiHandle.FromOwnedHandle(res.NewAudioStream.Stream.Handle);
             FfiClient.Instance.AudioStreamEventReceived += OnAudioStreamEvent;
 
+            //Eigene Implementation
             _audioSource = source;
-            var probe = _audioSource.gameObject.AddComponent<AudioProbe>();
-            probe.AudioRead += OnAudioRead;
+            //Es wird immer die SampleRate von Unity benutzt
+            _targetSampleRate=(uint)AudioSettings.outputSampleRate;
+            _targetChannels = 2;
+
+            _numChannels = _targetChannels;
+            _sampleRate = _targetSampleRate;
+
+            int ringBufferSizeBytes = (int)(_targetChannels * _targetSampleRate * 0.7f * sizeof(short));
+            _buffer = new RingBuffer(ringBufferSizeBytes);
+
+            int clipLengthSamples = (int)_targetSampleRate;
+            
+            //Ein echter AudioClip wird erstellt
+            _streamClip = AudioClip.Create(
+                name: "LiveKitStream",
+                lengthSamples: clipLengthSamples,
+                channels: (int)_targetChannels,
+                frequency: (int)_targetSampleRate,
+                stream: true,
+                pcmreadercallback: OnClipRead
+            );
+            _audioSource.clip = _streamClip;
+            _audioSource.loop = true;
+
+
+            //var probe = _audioSource.gameObject.AddComponent<AudioProbe>();
+            //probe.AudioRead += OnAudioRead;
             _audioSource.Play();
+        }
+
+        private void OnClipRead(float[] data)
+        {
+            lock (_lock)
+            {
+                if(_buffer == null)
+                {
+                    Array.Clear(data, 0, data.Length);
+                    return;
+                }
+                if(_tempBuffer == null || _tempBuffer.Length != data.Length)
+                {
+                    _tempBuffer = new short[data.Length];
+                }
+                var tempBytes = MemoryMarshal.Cast<short, byte>(_tempBuffer.AsSpan().Slice(0, data.Length));
+                int readBytes = _buffer.Read(tempBytes);
+                int readSamples = readBytes / sizeof(short);
+                Array.Clear(data, 0, data.Length);
+                for(int i = 0; i<readSamples; i++)
+                {
+                    data[i] = _tempBuffer[i] / 32768f;
+                }
+            }
         }
 
         // Called on Unity audio thread
