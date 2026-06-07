@@ -1,3 +1,34 @@
+# Tell-Experience LiveKit Client SDK Unity Fork
+
+> This repository is a fork of the official LiveKit Cliend SDK Unity
+> It contains project-specific changes required for the Bachelor's thesis
+
+## About this Fork
+This repository is based on the official LiveKit Client SDK Unity. The original README below is kept because it contains useful general information about LiveKit, installation, usage, SDK behavior and additional links.
+This fork includes custom changes for the Bachelor's thesis and may differ from the official LiveKit SDK.
+
+## Changes
+The following project-specific changes were made:
+- Added Android microphone to get the audiostream working on a VR headset
+- Modified the audiostream so that the audio from LiveKit is sent to a real AudioSource in Unity. this was necessary for lip-sync.
+
+## Purpose
+This fork i used by the VR representation.
+It exists because the original LiveKit Client SDK Unity required small adjustments for this project's use case.
+
+## Original LiveKit Repository
+```txt
+https://github.com/livekit/client-sdk-unity
+```
+
+
+---
+
+
+# Original LiveKit SDK README:
+
+
+
 <!--BEGIN_BANNER_IMAGE-->
 
 <picture>
